@@ -9,12 +9,12 @@ export module authextension {
   export let setContextData: any;
 
   setContextData = (context_f8_access_routes, context_f8_3scale_user_key) => {
-    Apiendpoint.STACK_API_URL = context_f8_access_routes.prod + '/api/v2/';
-    Apiendpoint.STACK_API_USER_KEY = context_f8_3scale_user_key;
-    Apiendpoint.OSIO_ROUTE_URL = context_f8_access_routes.prod;
+    Apiendpoint.STACK_API_URL = Apiendpoint.STAGE_API_URL + '/api/v2/';
+    Apiendpoint.STACK_API_USER_KEY = Apiendpoint.STAGE_THREE_SCALE_USER_TOKEN;
+    Apiendpoint.OSIO_ROUTE_URL = Apiendpoint.STAGE_API_URL;
     process.env['RECOMMENDER_API_URL'] =
-      context_f8_access_routes.prod + '/api/v2';
-    process.env['THREE_SCALE_USER_TOKEN'] = context_f8_3scale_user_key;
+      Apiendpoint.STAGE_API_URL + '/api/v2';
+    process.env['THREE_SCALE_USER_TOKEN'] = Apiendpoint.STAGE_THREE_SCALE_USER_TOKEN;
   };
 
   export function setUUID(uuid) {
@@ -59,8 +59,7 @@ export module authextension {
   };
 
   export async function getUUID(): Promise<string> {
-    const url = `${
-      Apiendpoint.OSIO_ROUTE_URL
+    const url = `${Apiendpoint.OSIO_ROUTE_URL
       }/user?user_key=${Apiendpoint.STACK_API_USER_KEY}`;
 
     const response = await fetch(url, { method: 'POST' });
@@ -76,8 +75,7 @@ export module authextension {
   export const get_3scale_routes = context => {
     return new Promise((resolve, reject) => {
       let options = {};
-      options['uri'] = `${
-        Apiendpoint.THREE_SCALE_CONNECT_URL
+      options['uri'] = `${Apiendpoint.THREE_SCALE_CONNECT_URL
         }get-endpoints?user_key=${Apiendpoint.THREE_SCALE_CONNECT_KEY}`;
       options['headers'] = { 'Content-Type': 'application/json' };
 

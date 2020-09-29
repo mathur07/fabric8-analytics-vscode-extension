@@ -46,7 +46,7 @@ export class DependencyReportPanel {
         retainContextWhenHidden: true,
 
         // And restric the webview to only loading content from our extension's `media` directory.
-        localResourceRoots: []
+        localResourceRoots: [],
       }
     );
 
@@ -66,7 +66,7 @@ export class DependencyReportPanel {
 
     // Update the content based on view changes
     this._panel.onDidChangeViewState(
-      e => {
+      (e) => {
         if (this._panel.visible) {
           // this._update();
           this._updateWebView();
@@ -78,7 +78,7 @@ export class DependencyReportPanel {
 
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
-      message => {
+      (message) => {
         switch (message.command) {
           case 'alert':
             vscode.window.showErrorMessage(message.text);
@@ -99,12 +99,8 @@ export class DependencyReportPanel {
       DependencyReportPanel.data = data;
       let r = header;
       let token_uri = undefined;
-      portal_uri = `${Apiendpoint.STACK_REPORT_URL}#/analyze/${
-        data.external_request_id
-        }?interframe=true&api_data={"access_token":"${token_uri}","route_config":{"api_url":"${
-        Apiendpoint.OSIO_ROUTE_URL
-        }","ver":"v3","uuid":"${process.env.UUID}"},"user_key":"${Apiendpoint.STACK_API_USER_KEY}"}`;
-      console.log("portal_uri", portal_uri);
+      portal_uri = `${Apiendpoint.STACK_REPORT_URL}#/analyze/${data.external_request_id}?interframe=true&api_data={"access_token":"${token_uri}","route_config":{"api_url":"${Apiendpoint.OSIO_ROUTE_URL}","ver":"v3","uuid":"${process.env.UUID}"},"user_key":"${Apiendpoint.STACK_API_USER_KEY}"}`;
+      console.log('portal_uri', portal_uri);
       r += render_stack_iframe(portal_uri);
       r += footer;
       this._panel.webview.html = r;
@@ -140,11 +136,7 @@ export class DependencyReportPanel {
     if (output && output.external_request_id) {
       let r = header;
       let token_uri = undefined;
-      portal_uri = `${Apiendpoint.STACK_REPORT_URL}#/analyze/${
-        output.external_request_id
-        }?interframe=true&api_data={"access_token":"${token_uri}","route_config":{"api_url":"${
-        Apiendpoint.OSIO_ROUTE_URL
-        }","ver":"v3","uuid":"${process.env.UUID}"},"user_key":"${Apiendpoint.STACK_API_USER_KEY}"}`;
+      portal_uri = `${Apiendpoint.STACK_REPORT_URL}#/analyze/${output.external_request_id}?interframe=true&api_data={"access_token":"${token_uri}","route_config":{"api_url":"${Apiendpoint.OSIO_ROUTE_URL}","ver":"v3","uuid":"${process.env.UUID}"},"user_key":"${Apiendpoint.STACK_API_USER_KEY}"}`;
       r += render_stack_iframe(portal_uri);
       r += footer;
       return r;
@@ -160,7 +152,7 @@ let render_project_failure = () => {
               </div>`;
 };
 
-let render_stack_iframe = portaluri => {
+let render_stack_iframe = (portaluri) => {
   //const result = sa.result[0];
   return `<iframe id="frame" width="100%" height="100%" frameborder="0" src=${portaluri}></iframe>
   
@@ -168,13 +160,22 @@ let render_stack_iframe = portaluri => {
 
   const vscode = acquireVsCodeApi();
   window.addEventListener('message', (e) => {
-    vscode.postMessage({
-      command: 'launch-link-in-external-browser',
-      url: e.data
-    });  
+
+    let data = JSON.parse(e.data);
+
+    if(data.indexOf('keyboard') !== -1) {
+        window.addEventListener('keydown', (e) => {
+          window.dispatchEvent(new KeyboardEvent('keydown', data));
+        }); 
+      } else {
+        vscode.postMessage({
+          command: 'launch-link-in-external-browser',
+          url: data
+        });      
+      }
 
   }, false);
-
+  
   </script>
 
   `;
